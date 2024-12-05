@@ -8,11 +8,11 @@ const bot = new TelegramBot(process.env.TELEGRAM_TOKEN);
 const handleTelegramBot = asyncErrorHandler(async (req, res, next) => {
   try {
     const { message } = req.body;
-    console.log(message);
+
     if (message && message.text.startsWith("/start")) {
       const chat_id = message.chat.id;
       const username = message.chat.username;
-      const referrer_id = message.text?.split(" ")[1];
+      const referrer_id = message.text.split(" ")[1] || "kelpie";
       const user = await User.findOne({ chat_id });
 
       const inlineKeyboard = {
@@ -29,11 +29,12 @@ const handleTelegramBot = asyncErrorHandler(async (req, res, next) => {
         await User.create({
           username,
           referral_id: new_referral_id,
-          referrer_id: referrer ? referrer_id : null,
+          referrer_id: referrer ? referrer_id : "kelpie",
           chat_id,
         });
 
-        console.log("User created!");
+        if (referrer) referrer.referrals.push(new_referral_id);
+        await referrer.save();
 
         bot.sendMessage(
           chat_id,
