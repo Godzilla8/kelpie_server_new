@@ -3,8 +3,6 @@ import TelegramBot from "node-telegram-bot-api";
 import asyncErrorHandler from "../utils/asyncErrorHandler.js";
 import User from "../models/userModel.js";
 import ShortUniqueId from "short-unique-id";
-
-console.log("hit");
 const bot = new TelegramBot(process.env.TELEGRAM_TOKEN);
 
 const handleTelegramBot = asyncErrorHandler(async (req, res, next) => {
