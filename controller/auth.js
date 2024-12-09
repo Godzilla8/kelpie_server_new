@@ -1,7 +1,9 @@
 import validateTelegramData from "../utils/validateTelegramData.js";
 import User from "../models/userModel.js";
 import asyncErrorHandler from "../utils/asyncErrorHandler.js";
-import jwt from "jsonwebtoken";
+import Task from "../models/taskModel.js";
+import { allTasks } from "../utils/taskList.js";
+import { createJwtToken, cookieOptions } from "../utils/createJwtToken.js";
 
 const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const { initData } = req.body;
@@ -12,17 +14,30 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
 
   const user = await User.findOne({ chat_id: validatedUser.id });
 
-  if (user) {
-    return res.status(200).json({ user, isVerified: true });
+  if (!user) {
+    // Work on this below. Check out validateUser details to make sure they are in order
+    const newUser = await User.create(validatedUser);
+    const { _id, chat_id } = newUser;
+
+    for (let task of allTasks) {
+      const newTask = await Task.create({ ...task, user: _id });
+      await newTask.save();
+    }
+
+    return res
+      .cookie("token", createJwtToken({ id: _id, chat_id }), cookieOptions)
+      .status(200)
+      .json("New User, Authentication success");
   }
 
-  //   Work on this below. Check out validateUser details to make sure they are in order
-  const newUser = await User.create(validatedUser);
-  const { _id, chat_id } = newUser;
-  const authToken = jwt.sign({ _id, chat_id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+  const { _id, chat_id } = user;
+
+  if (req.cookies.token) {
+    return res.status(200).json("Authentication success");
+  }
 
   return res
-    .cookie("token", authToken, { maxAge: 3600, secure: true, httpOnly: true })
+    .cookie("token", createJwtToken({ id: _id, chat_id }), cookieOptions)
     .status(200)
     .json("Authentication success");
 });

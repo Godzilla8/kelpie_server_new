@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
-import CustomError from "../utils/customError";
-import User from "../models/userModel";
+import CustomError from "../utils/customError.js";
+import User from "../models/userModel.js";
 
 const verifyJWT = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+  // const authHeader = req.headers["authorization"];
+  // const token = authHeader && authHeader.split(" ")[1];
+  const { token } = req.cookies;
 
   if (!token) return next(new CustomError("User not authenticated", 401));
 
@@ -18,4 +19,4 @@ const verifyJWT = (req, res, next) => {
   });
 };
 
-module.exports = verifyJWT;
+export default verifyJWT;

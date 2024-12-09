@@ -3,12 +3,16 @@ import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
-import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import farmRoutes from "./routes/farmRoutes.js";
 import botRoutes from "./routes/botRoutes.js";
+import taskRoutes from "./routes/taskRoutes.js";
 import connectDatabase from "./dbConnect.js";
+import CustomError from "./utils/customError.js";
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import globalErorHandler from "./middleware/errorHandler.js";
+import verifyJWT from "./middleware/verifyJwt.js";
 
 const app = express();
 
@@ -21,14 +25,17 @@ connectDatabase();
 const PORT = process.env.PORT || 3000;
 
 app.use(helmet());
-app.use(cors({ origin: "*" }));
-app.use(bodyParser.json());
-app.use(express.json());
+app.use(cors({ origin: process.env.PROD_SERVER_URL, credentials: true }));
 app.use(cookieParser());
-app.use(morgan("combined"));
+app.use(express.json());
+// app.use(morgan("combined"));
 
+app.use("/api/v1/", authRoutes);
 app.use("/", botRoutes);
+app.use(verifyJWT);
+app.use("/api/v1/", userRoutes);
 app.use("/api/v1/reward/", farmRoutes);
+app.use("/api/v1/task/", taskRoutes);
 
 app.all("*", (req, res, next) => {
   const err = new CustomError(`Can't find ${req.originalUrl} on this server!`, 404);

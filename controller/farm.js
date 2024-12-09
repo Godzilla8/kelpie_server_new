@@ -1,16 +1,17 @@
-import Farm from "../models/farmModel.js";
+import User from "../models/userModel.js";
 import asyncErrorHandler from "../utils/asyncErrorHandler.js";
+import isTimeElapsed from "../utils/isTimeElapsed.js";
 
 export const claimFarmReward = asyncErrorHandler(async (req, res, next) => {
-  const farm = await Farm.findOne({ user: req.user.id });
+  const user = await User.findOne({ _id: req.user._id });
+  if (user) {
+    const { last_claim_date, max_hour_limit, max_reward } = user;
+    const isComplete = isTimeElapsed(last_claim_date, max_hour_limit);
 
-  if (farm) {
-    const { last_claim_date, max_hour_limit, max_reward } = farm;
-    const now = new Date.getTime();
-    const difference = (now - last_claim_date) / 1000;
-
-    if (difference >= max_hour_limit) {
-      total_reward += max_reward;
+    if (isComplete) {
+      user.total_reward += max_reward;
+      user.last_claim_date = new Date();
+      await user.save();
       return res.status(200).json("Claimed successfully.");
     }
 
