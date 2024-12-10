@@ -7,7 +7,7 @@ import { createJwtToken, cookieOptions } from "../utils/createJwtToken.js";
 
 const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const { initData } = req.body;
-
+  console.log(initData, "REQ-BODY", req.body);
   const validatedUser = validateTelegramData(initData);
 
   if (!validatedUser) return res.status(401).json("Error validating user");
