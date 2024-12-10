@@ -5,7 +5,6 @@ import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import farmRoutes from "./routes/farmRoutes.js";
-import botRoutes from "./routes/botRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import connectDatabase from "./dbConnect.js";
 import CustomError from "./utils/customError.js";
@@ -31,7 +30,6 @@ app.use(express.json());
 // app.use(morgan("combined"));
 
 app.use("/api/v1/", authRoutes);
-app.use("/", botRoutes);
 app.use(verifyJWT);
 app.use("/api/v1/", userRoutes);
 app.use("/api/v1/reward/", farmRoutes);

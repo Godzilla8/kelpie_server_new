@@ -2,9 +2,9 @@ import { model, Schema } from "mongoose";
 
 const UserSchema = new Schema(
   {
-    username: String,
+    username: { type: String, unique: true },
     full_name: String,
-    chat_id: { type: String, unique: true },
+    chat_id: { type: String, unique: true, required: true },
     referral_id: { type: String, unique: true },
     referrer_id: String,
     referral_count: Number,
