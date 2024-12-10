@@ -17,8 +17,6 @@ const validateTelegramData = (initData) => {
   arr.sort((a, b) => a.localeCompare(b));
   const dataCheckString = arr.join("\n");
 
-  console.log(userData);
-
   const _hash = crypto.createHmac("sha256", secret.digest()).update(dataCheckString).digest("hex");
 
   if (hash !== _hash) return false;
