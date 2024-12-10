@@ -9,8 +9,8 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const { initData } = req.body;
 
   const validatedUser = validateTelegramData(initData);
-
-  if (!validatedUser) return res.status(401).json("Error validating user");
+  console.log(validatedUser);
+  if (validatedUser) return res.status(401).json("Error validating user");
 
   const user = await User.findOne({ chat_id: validatedUser.id });
 
