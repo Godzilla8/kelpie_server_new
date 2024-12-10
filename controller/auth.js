@@ -9,14 +9,19 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const { initData } = req.body;
 
   const validatedUser = validateTelegramData(initData);
-  console.log(validatedUser);
+  console.log("validatedUser", validatedUser);
   if (validatedUser) return res.status(401).json("Error validating user");
 
   const user = await User.findOne({ chat_id: validatedUser.id });
+  const { username, id, first_name, last_name } = validatedUser;
 
   if (!user) {
     // Work on this below. Check out validateUser details to make sure they are in order
-    const newUser = await User.create(validatedUser);
+    const newUser = await User.create({
+      username,
+      chat_id: id,
+      full_name: first_name + " " + last_name,
+    });
     const { _id, chat_id } = newUser;
 
     for (let task of allTasks) {
