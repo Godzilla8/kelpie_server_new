@@ -11,6 +11,7 @@ export const claimFarmReward = asyncErrorHandler(async (req, res, next) => {
     if (isComplete) {
       user.total_reward += max_reward;
       user.last_claim_date = new Date();
+      user.num_of_claims += 1;
       await user.save();
       return res.status(200).json("Claimed successfully.");
     }
