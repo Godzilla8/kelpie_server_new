@@ -13,16 +13,17 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   if (!validatedUser.id) return res.status(401).json("Error validating user");
 
   const user = await User.findOne({ chat_id: validatedUser.id });
-  const { username, id, first_name, last_name } = validatedUser;
 
   if (!user) {
-    // Work on this below. Check out validateUser details to make sure they are in order
+    console.log("user doesn't exist");
+    const { username, id, first_name, last_name } = validatedUser;
     const newUser = new User({
       username,
       chat_id: id,
       full_name: first_name + " " + last_name,
       referrer_id: "kelpie",
     });
+    console.log("New User Created");
 
     await newUser.save();
     const { _id, chat_id } = newUser;
@@ -31,6 +32,7 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
       const newTask = new Task({ ...task, user: _id });
       await newTask.save();
     }
+    console.log("Task Created");
 
     return res
       .cookie("token", createJwtToken({ id: _id, chat_id }), cookieOptions)
