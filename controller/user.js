@@ -2,6 +2,7 @@ import User from "../models/userModel.js";
 import asyncErrorHandler from "../utils/asyncErrorHandler.js";
 
 export const fetchUser = asyncErrorHandler(async (req, res, next) => {
+  console.log("req.user>>>: ", req.user);
   if (req.user.chat_id) {
     const {
       username,

@@ -1,3 +1,4 @@
+import "dotenv/config";
 import jwt from "jsonwebtoken";
 import CustomError from "../utils/customError.js";
 import User from "../models/userModel.js";
