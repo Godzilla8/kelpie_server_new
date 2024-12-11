@@ -1,3 +1,4 @@
+import "dotenv/config";
 import CustomError from "../utils/customError.js";
 
 const devErrors = (res, error) => {
