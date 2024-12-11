@@ -17,16 +17,18 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
 
   if (!user) {
     // Work on this below. Check out validateUser details to make sure they are in order
-    const newUser = await User.create({
+    const newUser = new User({
       username,
       chat_id: id,
       full_name: first_name + " " + last_name,
       referrer_id: "kelpie",
     });
+
+    await newUser.save();
     const { _id, chat_id } = newUser;
 
     for (let task of allTasks) {
-      const newTask = await Task.create({ ...task, user: _id });
+      const newTask = new Task({ ...task, user: _id });
       await newTask.save();
     }
 
