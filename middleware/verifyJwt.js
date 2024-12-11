@@ -7,7 +7,7 @@ const verifyJWT = (req, res, next) => {
   // const authHeader = req.headers["authorization"];
   // const token = authHeader && authHeader.split(" ")[1];
   const { token } = req.cookies;
-  console.log(token);
+
   if (!token) return next(new CustomError("User not authenticated", 401));
 
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {

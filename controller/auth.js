@@ -40,7 +40,7 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   if (req.cookies.token) {
     return res.status(200).json("Authentication success");
   }
-
+  console.log("authToken", createJwtToken({ id: _id, chat_id }));
   return res
     .cookie("token", createJwtToken({ id: _id, chat_id }), cookieOptions)
     .status(200)
