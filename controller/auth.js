@@ -7,15 +7,17 @@ import { createJwtToken, cookieOptions } from "../utils/createJwtToken.js";
 
 const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const { initData } = req.body;
-
+  console.log("cookies", req.cookies);
   const validatedUser = validateTelegramData(initData);
 
   if (!validatedUser.id) return res.status(401).json("Error validating user");
 
   const user = await User.findOne({ chat_id: validatedUser.id });
+  console.log("user find >>>", user);
 
   if (!user) {
     console.log("user doesn't exist");
+
     const { username, id, first_name, last_name } = validatedUser;
     const newUser = new User({
       username,
@@ -39,7 +41,7 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
       .status(200)
       .json("New User, Authentication success");
   }
-
+  console.log("user found");
   const { _id, chat_id } = user;
 
   if (req.cookies.token) {
