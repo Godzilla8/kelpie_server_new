@@ -3,14 +3,14 @@ export const setCookieOptions = (env) => {
     return {
       httpOnly: true,
       secure: true,
-      maxAge: 14400000,
+      maxAge: 3600000,
     };
   }
 
   if (env === "dev") {
     return {
       httpOnly: true,
-      maxAge: 14400000,
+      maxAge: 3600000,
     };
   }
 };
