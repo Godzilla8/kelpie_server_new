@@ -45,7 +45,7 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   console.log("auth2", token);
 
   return res
-    .cookie("token", token, setCookieOptions("prod"))
+    .cookie("token", token, { httpOnly: true, secure: true, maxAge: 1000 * 60 * 60 })
     .status(200)
     .json("User authenticated.");
 });

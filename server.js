@@ -24,7 +24,7 @@ connectDatabase();
 const PORT = process.env.PORT || 3000;
 
 app.use(cookieParser());
-// app.use(helmet());
+app.use(helmet());
 
 if (process.env.NODE_ENV === "production") {
   app.use(cors({ origin: process.env.PROD_SERVER_URL, credentials: true }));
@@ -36,15 +36,15 @@ if (process.env.NODE_ENV === "development") {
 app.use(express.json());
 // app.use(morgan("combined"));
 
+app.get("/api/v1", (req, res, next) => {
+  res.send("Welcome, server is running");
+});
+
 app.use("/api/v1/", authRoutes);
 app.use(verifyJWT);
 app.use("/api/v1/", userRoutes);
 app.use("/api/v1/reward/", farmRoutes);
 app.use("/api/v1/task/", taskRoutes);
-
-app.get("/", (req, res, next) => {
-  res.send("Welcome, server is running");
-});
 
 app.all("*", (req, res, next) => {
   const err = new CustomError(`Can't find ${req.originalUrl} on this server!`, 404);
