@@ -6,8 +6,9 @@ import User from "../models/userModel.js";
 const verifyJWT = (req, res, next) => {
   // const authHeader = req.headers["authorization"];
   // const token = authHeader && authHeader.split(" ")[1];
+
   const { token } = req.cookies;
-  console.log(token);
+  console.log(req.cookies);
   if (!token) return next(new CustomError("User not authenticated", 401));
 
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
