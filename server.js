@@ -24,7 +24,14 @@ connectDatabase();
 const PORT = process.env.PORT || 3000;
 
 app.use(helmet());
-app.use(cors({ origin: process.env.PROD_SERVER_URL, credentials: true }));
+
+if (process.env.NODE_ENV === "production") {
+  app.use(cors({ origin: process.env.PROD_SERVER_URL, credentials: true }));
+}
+if (process.env.NODE_ENV === "development") {
+  app.use(cors({ origin: process.env.LOCAL_ORIGIN, credentials: true }));
+}
+
 app.use(cookieParser());
 app.use(express.json());
 // app.use(morgan("combined"));

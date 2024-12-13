@@ -3,7 +3,8 @@ import User from "../models/userModel.js";
 import asyncErrorHandler from "../utils/asyncErrorHandler.js";
 import Task from "../models/taskModel.js";
 import { allTasks } from "../utils/taskList.js";
-import { createJwtToken, cookieOptions } from "../utils/createJwtToken.js";
+import { createJwtToken } from "../utils/createJwtToken.js";
+import { setCookieOptions } from "../utils/cookieOptions.js";
 
 const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const { initData } = req.body;
@@ -12,6 +13,7 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   if (!validatedUser.id) return res.status(401).json("Error validating user");
 
   const user = await User.findOne({ chat_id: validatedUser.id });
+  // const user = await User.findOne({ chat_id: "5903277" });
 
   if (!user) {
     const { username, id, first_name, last_name } = validatedUser;
@@ -30,21 +32,21 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
       await newTask.save();
     }
 
-    return res
-      .cookie("token", createJwtToken({ id: _id, chat_id }), cookieOptions)
-      .status(200)
-      .json("New User, Authentication success");
+    const token = createJwtToken({ id: _id, chat_id });
+    return res.status(200).json({ token: token });
   }
 
+  if (req.cookies.token) return res.status(200).json("User authenticated.");
+
   const { _id, chat_id } = user;
-  if (req.cookies.token) {
-    return res.status(200).json("Authentication success");
-  }
-  console.log("authToken", createJwtToken({ id: _id, chat_id }));
+  const token = createJwtToken({ id: _id, chat_id });
+
+  console.log(token);
+
   return res
-    .cookie("token", createJwtToken({ id: _id, chat_id }), cookieOptions)
+    .cookie("token", token, setCookieOptions("prod"))
     .status(200)
-    .json("Authentication success");
+    .json("User authenticated.");
 });
 
 export default authenticateUser;
