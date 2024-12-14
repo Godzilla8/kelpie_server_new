@@ -1,19 +1,18 @@
+import "dotenv/config";
 import validateTelegramData from "../utils/validateTelegramData.js";
 import User from "../models/userModel.js";
 import asyncErrorHandler from "../utils/asyncErrorHandler.js";
 import Task from "../models/taskModel.js";
 import { allTasks } from "../utils/taskList.js";
 import { createJwtToken } from "../utils/createJwtToken.js";
-import { setCookieOptions } from "../utils/cookieOptions.js";
+import isTimeElapsed from "../utils/isTimeElapsed.js";
 
 const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const { initData } = req.body;
   const validatedUser = validateTelegramData(initData);
-
   if (!validatedUser.id) return res.status(401).json("Error validating user");
 
   const user = await User.findOne({ chat_id: validatedUser.id });
-  // const user = await User.findOne({ chat_id: "5903277" });
 
   if (!user) {
     const { username, id, first_name, last_name } = validatedUser;
@@ -32,22 +31,25 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
       await newTask.save();
     }
 
-    const token = createJwtToken({ id: _id, chat_id });
-    return res.status(200).json({ token: token });
+    const accessToken = createJwtToken({ id: _id, chat_id }, process.env.JWT_SECRET, "30m");
+    newUser.accessToken = accessToken;
+    newUser.tokenCreationDate = new Date();
+    await newUser.save();
+    res.status(200).json({ accessToken });
   }
 
-  console.log("auth1", req.cookies.token);
-  if (req.cookies.token) return res.status(200).json("User authenticated.");
+  const { _id, chat_id, tokenCreationDate, accessToken } = user;
+  const isJWTExpired = isTimeElapsed(tokenCreationDate, 1800);
+  let token = accessToken;
 
-  const { _id, chat_id } = user;
-  const token = createJwtToken({ id: _id, chat_id });
+  if (isJWTExpired || !accessToken) {
+    token = createJwtToken({ id: _id, chat_id }, process.env.JWT_SECRET, "30m");
+    user.tokenCreationDate = new Date();
+    user.accessToken = token;
+    await user.save();
+  }
 
-  console.log("auth2", token);
-
-  return res
-    .cookie("token", token, { httpOnly: true, secure: true, maxAge: 1000 * 60 * 60 })
-    .status(200)
-    .json("User authenticated.");
+  return res.status(200).json({ accessToken: token });
 });
 
 export default authenticateUser;

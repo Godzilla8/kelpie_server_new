@@ -13,6 +13,8 @@ const UserSchema = new Schema(
     max_reward: { type: Number, default: 100 },
     num_of_claims: { type: Number, default: 0 },
     total_reward: { type: Number, default: 0 },
+    accessToken: String,
+    tokenCreationDate: Date,
   },
   { timestamps: true }
 );

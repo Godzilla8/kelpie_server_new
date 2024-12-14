@@ -40,7 +40,7 @@ app.get("/api/v1", (req, res, next) => {
   res.send("Welcome, server is running");
 });
 
-app.use("/api/v1/", authRoutes);
+app.use("/api/v1/auth/", authRoutes);
 app.use(verifyJWT);
 app.use("/api/v1/", userRoutes);
 app.use("/api/v1/reward/", farmRoutes);
