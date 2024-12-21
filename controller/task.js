@@ -3,14 +3,21 @@ import asyncErrorHandler from "../utils/asyncErrorHandler.js";
 import CustomError from "../utils/customError.js";
 import User from "../models/userModel.js";
 import isTimeElapsed from "../utils/isTimeElapsed.js";
+import { allTasks } from "../utils/taskList.js";
 
 export const fetchTasks = asyncErrorHandler(async (req, res, next) => {
-  const tasks = await Task.find({
-    user: req.user._id,
-    status: { $in: ["not-started", "in-review"] },
-  });
+  const tasks = await Task.find({ user: req.user._id });
 
-  return res.status(200).json(tasks);
+  const newTasks = allTasks.filter(
+    (mainTask) => !tasks.some((userTask) => mainTask.task_id === userTask.task_id)
+  );
+
+  for (let task of newTasks) {
+    await Task.create({ ...task, status: "not-started", user: req.user.id });
+  }
+
+  const fetchedTasks = await Task.find({ user: req.user._id });
+  return res.status(200).json(fetchedTasks?.filter((task) => task.status !== "completed"));
 });
 
 export const performTask = asyncErrorHandler(async (req, res, next) => {
@@ -38,7 +45,7 @@ export const claimTaskReward = asyncErrorHandler(async (req, res, next) => {
   const task = await Task.findOne({ user: _id, task_id: id });
 
   if (task) {
-    const isCompleted = isTimeElapsed(task.click_time, 300);
+    const isCompleted = isTimeElapsed(task.click_time, 180);
     if (isCompleted) task.status = "completed";
     await task.save();
 

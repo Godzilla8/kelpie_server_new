@@ -15,6 +15,8 @@ const UserSchema = new Schema(
     total_reward: { type: Number, default: 0 },
     accessToken: String,
     tokenCreationDate: Date,
+    streak: { type: Number, default: 0 },
+    daily_claim_date: { type: Date, default: new Date(1000000000000) },
   },
   { timestamps: true }
 );

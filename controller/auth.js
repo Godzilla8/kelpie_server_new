@@ -2,8 +2,6 @@ import "dotenv/config";
 import validateTelegramData from "../utils/validateTelegramData.js";
 import User from "../models/userModel.js";
 import asyncErrorHandler from "../utils/asyncErrorHandler.js";
-import Task from "../models/taskModel.js";
-import { allTasks } from "../utils/taskList.js";
 import { createJwtToken } from "../utils/createJwtToken.js";
 import isTimeElapsed from "../utils/isTimeElapsed.js";
 
@@ -20,16 +18,11 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
       username,
       chat_id: id,
       full_name: first_name + " " + last_name,
-      referrer_id: "kelpie",
+      referrer_id: "KelpieNetwork",
     });
 
     await newUser.save();
     const { _id, chat_id } = newUser;
-
-    for (let task of allTasks) {
-      const newTask = new Task({ ...task, user: _id });
-      await newTask.save();
-    }
 
     const accessToken = createJwtToken({ id: _id, chat_id }, process.env.JWT_SECRET, "30m");
     newUser.accessToken = accessToken;
@@ -38,11 +31,20 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
     res.status(200).json({ accessToken });
   }
 
-  const { _id, chat_id, tokenCreationDate, accessToken } = user;
-  const isJWTExpired = isTimeElapsed(tokenCreationDate, 1800);
-  let token = accessToken;
+  const { _id, chat_id } = user;
+  let token = user?.accessToken;
 
-  if (isJWTExpired || !accessToken) {
+  if (!user?.tokenCreationDate || !user?.accessToken) {
+    token = createJwtToken({ id: _id, chat_id }, process.env.JWT_SECRET, "30m");
+    user.tokenCreationDate = new Date();
+    user.accessToken = token;
+    await user.save();
+    return res.status(200).json({ accessToken: token });
+  }
+
+  const isJWTExpired = isTimeElapsed(user?.tokenCreationDate, 1800);
+
+  if (isJWTExpired) {
     token = createJwtToken({ id: _id, chat_id }, process.env.JWT_SECRET, "30m");
     user.tokenCreationDate = new Date();
     user.accessToken = token;

@@ -39,3 +39,39 @@ export const fetchReferrals = asyncErrorHandler(async (req, res, next) => {
     .sort({ createdAt: -1 });
   return res.status(200).json(user);
 });
+
+export const fetchLeaderBoard = asyncErrorHandler(async (req, res, next) => {
+  try {
+    const result = await User.aggregate([
+      {
+        $match: {
+          // Include users with total_reward >= 0
+          total_reward: { $gte: 0 },
+        },
+      },
+      {
+        $setWindowFields: {
+          sortBy: { total_reward: -1 }, // Sort by total_reward in descending order
+          output: {
+            position: { $denseRank: {} }, // Assign contiguous positions
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0, // Exclude the MongoDB `_id` field
+          username: 1, // Include the username
+          full_name: 1,
+          chat_id: 1,
+          total_reward: 1, // Include the total_reward
+          position: 1, // Include the position
+        },
+      },
+    ]);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error);
+    return res.status(500).json("Error fetching leaderboard:");
+  }
+});

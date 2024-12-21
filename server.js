@@ -36,10 +36,9 @@ if (process.env.NODE_ENV === "development") {
 app.use(express.json());
 // app.use(morgan("combined"));
 
-app.get("/api/v1", (req, res, next) => {
+app.get("/", (req, res, next) => {
   res.send("Welcome, server is running");
 });
-
 app.use("/api/v1/auth/", authRoutes);
 app.use(verifyJWT);
 app.use("/api/v1/", userRoutes);
