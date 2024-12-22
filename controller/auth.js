@@ -8,6 +8,7 @@ import isTimeElapsed from "../utils/isTimeElapsed.js";
 const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const { initData } = req.body;
   const validatedUser = validateTelegramData(initData);
+  console.log(validatedUser);
   if (!validatedUser.id) return res.status(401).json("Error validating user");
 
   const user = await User.findOne({ chat_id: validatedUser.id });
