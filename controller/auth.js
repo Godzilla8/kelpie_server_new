@@ -15,14 +15,13 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
 
   if (!user) {
     const { username, id, first_name, last_name } = validatedUser;
-    const newUser = new User({
-      username,
+    const newUser = User.create({
+      username: username ? username : " ",
       chat_id: id,
       full_name: first_name + " " + last_name,
       referrer_id: "KelpieNetwork",
     });
 
-    await newUser.save();
     const { _id, chat_id } = newUser;
 
     const accessToken = createJwtToken({ id: _id, chat_id }, process.env.JWT_SECRET, "30m");
