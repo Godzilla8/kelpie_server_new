@@ -5,33 +5,46 @@ const validateTelegramData = (initData) => {
   if (!initData) return false;
 
   const encoded = decodeURIComponent(initData);
-  const secret = crypto
+  const params = new URLSearchParams(encoded);
+
+  // Extract and remove the hash from the parameters
+  const receivedHash = params.get("hash");
+  if (!receivedHash) return false;
+  params.delete("hash");
+
+  // Sort and concatenate the remaining parameters
+  const dataCheckString = Array.from(params.entries())
+    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+    .map(([key, value]) => `${key}=${value}`)
+    .join("\n");
+
+  // Create the secret key
+  const secretKey = crypto
     .createHmac("sha256", "WebAppData")
     .update(process.env.TELEGRAM_TOKEN)
     .digest();
 
-  const arr = encoded.split("&");
-  const hashIndex = arr.findIndex((str) => str.startsWith("hash="));
-  const userIndex = arr.findIndex((str) => str.startsWith("user="));
+  // Generate the HMAC hash
+  const generatedHash = crypto
+    .createHmac("sha256", secretKey)
+    .update(dataCheckString)
+    .digest("hex");
 
-  if (hashIndex === -1 || userIndex === -1) return false;
-
-  const hash = arr.splice(hashIndex, 1)[0].split("=")[1];
-  const userObj = arr[userIndex].split("=")[1];
-
-  let userData;
-  try {
-    userData = JSON.parse(userObj);
-  } catch (error) {
+  // Compare hashes
+  if (receivedHash !== generatedHash) {
+    console.log("Hash mismatch:", { receivedHash, generatedHash, dataCheckString });
     return false;
   }
 
-  arr.sort((a, b) => a.localeCompare(b));
-  const dataCheckString = arr.join("\n");
-
-  const _hash = crypto.createHmac("sha256", secret).update(dataCheckString).digest("hex");
-
-  if (hash !== _hash) return false;
+  // Parse the user data (optional, based on your needs)
+  const user = params.get("user");
+  let userData;
+  try {
+    userData = JSON.parse(user);
+  } catch (error) {
+    console.error("Failed to parse user data:", error);
+    return false;
+  }
 
   return userData;
 };
