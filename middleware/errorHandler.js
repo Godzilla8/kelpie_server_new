@@ -22,6 +22,7 @@ const prodErrors = (res, error) => {
       message: "Something went wrong! Please try again later.",
     });
   }
+  console.log(error);
 };
 
 function castErrorHandler(err) {
