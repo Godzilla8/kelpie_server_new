@@ -7,6 +7,7 @@ import isTimeElapsed from "../utils/isTimeElapsed.js";
 
 const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const { initData } = req.body;
+  console.log(initData);
   const validatedUser = await validateTelegramData(initData);
   if (!validatedUser.id) return res.status(401).json("Error validating user");
 
@@ -33,7 +34,7 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const { _id, chat_id } = user;
   let token = user?.accessToken;
 
-  if (!user?.tokenCreationDate || !user?.accessToken) {
+  if (!user?.tokenCreationDate || !token) {
     token = createJwtToken({ id: _id, chat_id }, process.env.JWT_SECRET, "30m");
     user.tokenCreationDate = new Date();
     user.accessToken = token;
