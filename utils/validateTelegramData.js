@@ -4,21 +4,20 @@ import crypto from "crypto";
 const validateTelegramData = (initData) => {
   if (!initData) return false;
 
-  const encoded = decodeURIComponent(initData);
-  const params = new URLSearchParams(encoded);
+  const params = new URLSearchParams(initData);
 
-  // Extract and remove the hash from the parameters
+  // Extract the `hash` (received from Telegram)
   const receivedHash = params.get("hash");
   if (!receivedHash) return false;
-  params.delete("hash");
+  params.delete("hash"); // Remove `hash` for generating the dataCheckString
 
-  // Sort and concatenate the remaining parameters
+  // Sort and construct the dataCheckString
   const dataCheckString = Array.from(params.entries())
-    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB)) // Sort alphabetically by key
     .map(([key, value]) => `${key}=${value}`)
     .join("\n");
 
-  // Create the secret key
+  // Generate the secret key
   const secretKey = crypto
     .createHmac("sha256", "WebAppData")
     .update(process.env.TELEGRAM_TOKEN)
@@ -36,7 +35,7 @@ const validateTelegramData = (initData) => {
     return false;
   }
 
-  // Parse the user data (optional, based on your needs)
+  // Parse the user data (if needed)
   const user = params.get("user");
   let userData;
   try {
@@ -46,7 +45,7 @@ const validateTelegramData = (initData) => {
     return false;
   }
 
-  return userData;
+  return userData; // Return parsed user data if validation succeeds
 };
 
 export default validateTelegramData;
