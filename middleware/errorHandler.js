@@ -16,13 +16,15 @@ const prodErrors = (res, error) => {
       status: error.statusCode,
       message: error.message,
     });
+    console.log(error.statusCode, error.message);
   } else {
-    res.status(500).json({
+    const error = {
       status: "error",
       message: "Something went wrong! Please try again later.",
-    });
+    };
+    res.status(500).json(error);
+    console.log(500, error.message);
   }
-  console.log(error);
 };
 
 function castErrorHandler(err) {

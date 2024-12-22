@@ -39,7 +39,6 @@ export const claimDailyReward = asyncErrorHandler(async (req, res, next) => {
 });
 
 export const claimMemoryGameReward = asyncErrorHandler(async (req, res, next) => {
-  console.log(req.body);
   const { score } = req.body;
 
   const user = await User.findOne({ _id: req.user.id });

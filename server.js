@@ -39,6 +39,7 @@ app.use(express.json());
 app.get("/", (req, res, next) => {
   res.send("Welcome, server is running");
 });
+
 app.use("/api/v1/auth/", authRoutes);
 app.use(verifyJWT);
 app.use("/api/v1/", userRoutes);
