@@ -6,21 +6,40 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import farmRoutes from "./routes/farmRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
-import connectDatabase from "./dbConnect.js";
+// import connectDatabase from "./dbConnect.js";
 import CustomError from "./utils/customError.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import globalErorHandler from "./middleware/errorHandler.js";
 import verifyJWT from "./middleware/verifyJwt.js";
+import mongoose from "mongoose";
 
 const app = express();
+
+const connectDatabase = async () => {
+  try {
+    if (process.env.NODE_ENV === "production") {
+      await mongoose.connect(process.env.MONGODB_URI, {
+        serverSelectionTimeoutMS: 30000, // Set timeout to 30 seconds
+        connectTimeoutMS: 30000, // Optional: Timeout for initial connection
+      });
+    }
+    if (process.env.NODE_ENV === "development") {
+      await mongoose.connect(process.env.LOCAL_MONGO_URI);
+    }
+    console.log("DB connected!");
+  } catch (error) {
+    console.log("Error connecting DB");
+  }
+};
+
+await connectDatabase();
 
 process.on("uncaughtException", (err) => {
   console.log(`ERROR NAME: ${err.name}\n ERROR MESSAGE: ${err.message}`);
   console.log("UNCAUGHT EXCEPTION! Server shutting down...");
 });
 
-connectDatabase();
 const PORT = process.env.PORT || 3000;
 
 app.use(cookieParser());
