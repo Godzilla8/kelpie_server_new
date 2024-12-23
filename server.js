@@ -6,7 +6,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import farmRoutes from "./routes/farmRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
-// import connectDatabase from "./dbConnect.js";
 import CustomError from "./utils/customError.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";

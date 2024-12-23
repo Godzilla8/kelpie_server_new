@@ -4,6 +4,7 @@ import User from "../models/userModel.js";
 import asyncErrorHandler from "../utils/asyncErrorHandler.js";
 import { createJwtToken } from "../utils/createJwtToken.js";
 import isTimeElapsed from "../utils/isTimeElapsed.js";
+import ShortUniqueId from "short-unique-id";
 
 const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const { initData } = req.body;
@@ -13,12 +14,16 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   const user = await User.findOne({ chat_id: validatedUser.id });
 
   if (!user) {
+    const create_code = new ShortUniqueId({ length: 10 });
+    const referral_id = create_code.rnd();
+
     const { username, id, first_name, last_name } = validatedUser;
     const newUser = User.create({
       username: username ? username : " ",
       chat_id: id,
       full_name: first_name + " " + last_name,
       referrer_id: "KelpieNetwork",
+      referral_id,
     });
 
     const { _id, chat_id } = newUser;

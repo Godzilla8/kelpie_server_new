@@ -1,7 +1,7 @@
 export const allTasks = [
   {
     type: "youtube",
-    title: "Subscibe Youtube",
+    title: "Subscribe Youtube",
     desc: "Watch videos on our channel",
     reward: 500,
     link: "https://www.youtube.com/@KelpieNetwork",
@@ -10,7 +10,7 @@ export const allTasks = [
   {
     type: "instagram",
     title: "Follow Instagram",
-    desc: "Get to see product media from our team",
+    desc: "Connect with us on the gram",
     reward: 500,
     link: "https://www.instagram.com/networkkelpie",
     task_id: "2",
@@ -18,9 +18,9 @@ export const allTasks = [
   {
     type: "telegram",
     title: "Join Channel",
-    desc: "Get to know what kelpie is all about",
+    desc: "We have exciting news for the community",
     reward: 500,
-    link: "https://t.me/KelpieNetwork",
+    link: "https://t.me/kelpienetworkofficial",
     task_id: "3",
   },
   {
@@ -33,7 +33,7 @@ export const allTasks = [
   },
   {
     type: "twitter",
-    title: "Retweet Our Post",
+    title: "Retweet Our Pinned Post",
     desc: "Twitter raids are exciting. Participate now!",
     reward: 500,
     link: "https://x.com/kelpienetwork",
@@ -42,7 +42,7 @@ export const allTasks = [
   {
     type: "telegram",
     title: "Join Group",
-    desc: "Connect with other Kelpians here. Join Now!",
+    desc: "Chat with other Kelpians here. Join Now!",
     reward: 500,
     link: "https://t.me/kelpienetwork",
     task_id: "6",
