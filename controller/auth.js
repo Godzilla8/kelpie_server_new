@@ -11,7 +11,7 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   if (!validatedUser) return res.status(401).json("Error validating user");
 
   const user = await User.findOne({ chat_id: validatedUser.id });
-  console.log(user);
+
   if (!user) {
     const { username, id, first_name, last_name } = validatedUser;
     const newUser = User.create({
