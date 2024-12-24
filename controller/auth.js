@@ -12,13 +12,20 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
   if (!validatedUser) return res.status(401).json("Error validating user");
 
   const user = await User.findOne({ chat_id: validatedUser.id });
+  // const user = await User.findOne({ username: "big-man" });
+  // const validatedUser = {
+  //   username: "big-man",
+  //   id: "70640272",
+  //   first_name: "moses",
+  //   last_name: "roku",
+  // };
 
   if (!user) {
     const create_code = new ShortUniqueId({ length: 10 });
     const referral_id = create_code.rnd();
 
     const { username, id, first_name, last_name } = validatedUser;
-    const newUser = User.create({
+    const newUser = await User.create({
       username: username ? username : " ",
       chat_id: id,
       full_name: first_name + " " + last_name,
@@ -32,7 +39,7 @@ const authenticateUser = asyncErrorHandler(async (req, res, next) => {
     newUser.accessToken = accessToken;
     newUser.tokenCreationDate = new Date();
     await newUser.save();
-    res.status(200).json({ accessToken });
+    return res.status(200).json({ accessToken });
   }
 
   const { _id, chat_id } = user;

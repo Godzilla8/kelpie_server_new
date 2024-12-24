@@ -12,6 +12,7 @@ import userRoutes from "./routes/userRoutes.js";
 import globalErorHandler from "./middleware/errorHandler.js";
 import verifyJWT from "./middleware/verifyJwt.js";
 import mongoose from "mongoose";
+import { rateLimit } from "express-rate-limit";
 
 const app = express();
 
@@ -53,6 +54,17 @@ if (process.env.NODE_ENV === "development") {
 
 app.use(express.json());
 // app.use(morgan("combined"));
+
+const limiter = rateLimit({
+  windowMs: 30 * 60 * 1000,
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  standardHeaders: true, // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
+  legacyHeaders: false,
+  message: "Too many requests from this IP, please try again later.",
+});
+
+// Apply the rate limiting middleware to all requests.
+app.use(limiter);
 
 app.get("/", (req, res, next) => {
   res.send("Welcome, server is running");

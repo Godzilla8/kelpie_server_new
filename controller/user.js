@@ -13,6 +13,8 @@ export const fetchUser = asyncErrorHandler(async (req, res, next) => {
       last_claim_date,
       max_reward,
       total_reward,
+      daily_claim_date,
+      streak,
     } = req.user;
 
     return res.status(200).json({
@@ -25,6 +27,8 @@ export const fetchUser = asyncErrorHandler(async (req, res, next) => {
       last_claim_date,
       max_reward,
       total_reward,
+      daily_claim_date,
+      streak,
     });
   }
   return res.status(400).json("User does not exist");
@@ -72,6 +76,6 @@ export const fetchLeaderBoard = asyncErrorHandler(async (req, res, next) => {
     return res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
-    return res.status(500).json("Error fetching leaderboard:");
+    return res.status(500).json("Error fetching leaderboard");
   }
 });
